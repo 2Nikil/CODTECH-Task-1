@@ -1,5 +1,5 @@
-/*Socilmedia Sentiment Analysis*/
-//importing dependencies
+Socilmedia Sentiment Analysis
+importing dependencies
 import numpy as np
 import pandas as pd
 import re
@@ -19,16 +19,16 @@ from sklearn.metrics import accuracy_score
 [nltk_data] Downloading package wordnet to
 [nltk_data]     C:\Users\nikhi\AppData\Roaming\nltk_data...
 [nltk_data]   Package wordnet is already up-to-date!
-//Printing the stopwords in english
+Printing the stopwords in english
 print(stopwords.words('english'))
 ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"]
-//loading the data from csv file to pandas dataframe
+loading the data from csv file to pandas dataframe
 twitter_data = pd.read_csv(r"C:\Users\nikhi\Downloads\training.1600000.processed.noemoticon.csv (1)\training.1600000.processed.noemoticon.csv", encoding='iso-8859-1')
 ​
-//Checking the number of rows and columns
+Checking the number of rows and columns
 twitter_data.shape
 (1599999, 6)
-//Printing the first five rows of the dataset
+Printing the first five rows of the dataset
 twitter_data.head()
 0	1467810369	Mon Apr 06 22:19:45 PDT 2009	NO_QUERY	_TheSpecialOne_	@switchfoot http://twitpic.com/2y1zl - Awww, that's a bummer. You shoulda got David Carr of Third Day to do it. ;D
 0	0	1467810672	Mon Apr 06 22:19:49 PDT 2009	NO_QUERY	scotthamilton	is upset that he can't update his Facebook by ...
@@ -36,7 +36,7 @@ twitter_data.head()
 2	0	1467811184	Mon Apr 06 22:19:57 PDT 2009	NO_QUERY	ElleCTF	my whole body feels itchy and like its on fire
 3	0	1467811193	Mon Apr 06 22:19:57 PDT 2009	NO_QUERY	Karoli	@nationwideclass no, it's not behaving at all....
 4	0	1467811372	Mon Apr 06 22:20:00 PDT 2009	NO_QUERY	joy_wolf	@Kwesidei not the whole crew
-//Naming the columns and reading the datset again
+Naming the columns and reading the datset again
 column_names=['target','id','date','flag','user','text']
 twitter_data = pd.read_csv(r"C:\Users\nikhi\Downloads\training.1600000.processed.noemoticon.csv (1)\training.1600000.processed.noemoticon.csv",names=column_names, encoding='iso-8859-1')
 ​
@@ -49,7 +49,7 @@ target	id	date	flag	user	text
 2	0	1467810917	Mon Apr 06 22:19:53 PDT 2009	NO_QUERY	mattycus	@Kenichan I dived many times for the ball. Man...
 3	0	1467811184	Mon Apr 06 22:19:57 PDT 2009	NO_QUERY	ElleCTF	my whole body feels itchy and like its on fire
 4	0	1467811193	Mon Apr 06 22:19:57 PDT 2009	NO_QUERY	Karoli	@nationwideclass no, it's not behaving at all....
-//Counting the number of missing values in the dataset
+Counting the number of missing values in the dataset
 twitter_data.isnull().sum()
 target    0
 id        0
@@ -58,13 +58,13 @@ flag      0
 user      0
 text      0
 dtype: int64
-//Checking the distribution of target column
+Checking the distribution of target column
 twitter_data['target'].value_counts()
 target
 0    800000
 4    800000
 Name: count, dtype: int64
-//Converting the target "4" to "1"
+Converting the target "4" to "1"
 twitter_data.replace({'target':{4:1}},inplace=True)
 Checking the distribution of target column
 twitter_data['target'].value_counts()
@@ -333,3 +333,47 @@ else:
 1
 [1]
 Positive Tweet
+# Importing necessary libraries for visualization
+import matplotlib.pyplot as plt
+​
+# Convert the 'date' column to datetime format
+twitter_data['date'] = pd.to_datetime(twitter_data['date'])
+​
+# Create a new column 'year_month' for monthly aggregation
+twitter_data['year_month'] = twitter_data['date'].dt.to_period('M')
+​
+# Group by 'year_month' and 'target', and count occurrences
+monthly_sentiment = twitter_data.groupby(['year_month', 'target']).size().unstack()
+​
+# Plotting the data
+plt.figure(figsize=(12, 6))
+plt.plot(monthly_sentiment.index.astype(str), monthly_sentiment[0], label='Negative', color='red')
+plt.plot(monthly_sentiment.index.astype(str), monthly_sentiment[1], label='Positive', color='green')
+plt.title('Monthly Sentiment Analysis of Tweets')
+plt.xlabel('Month')
+plt.ylabel('Number of Tweets')
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+​
+# Optional: For finer granularity, use weekly aggregation instead of monthly
+twitter_data['week'] = twitter_data['date'].dt.to_period('W')
+weekly_sentiment = twitter_data.groupby(['week', 'target']).size().unstack()
+​
+plt.figure(figsize=(12, 6))
+plt.plot(weekly_sentiment.index.astype(str), weekly_sentiment[0], label='Negative', color='red')
+plt.plot(weekly_sentiment.index.astype(str), weekly_sentiment[1], label='Positive', color='green')
+plt.title('Weekly Sentiment Analysis of Tweets')
+plt.xlabel('Week')
+plt.ylabel('Number of Tweets')
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+​
+C:\Users\nikhi\anaconda3\Lib\site-packages\dateutil\parser\_parser.py:1207: UnknownTimezoneWarning: tzname PDT identified but not understood.  Pass `tzinfos` argument in order to correctly return a timezone-aware datetime.  In a future version, this will raise an exception.
+  warnings.warn("tzname {tzname} identified but not understood.  "
+
